@@ -59,7 +59,7 @@ export const FirebaseProvider: React.FC<PropsWithChildren<Props>> = ({
 	const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
 	const allFilesFetched = useRef(false);
 	const { db, createNewDrive, addFileToDrive, deleteFileFromDrive,
-		deleteFilesInFolder, getFileByFullPath, getFileFromDrive } = useIndexedDB(); // import indexeddb hook
+		deleteFilesInFolder, getFileByFullPath } = useIndexedDB(); // import indexeddb hook
 	const driveName = data.name;
 
 	const addFolder = (name: string) => {
