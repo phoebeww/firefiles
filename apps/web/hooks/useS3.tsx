@@ -14,14 +14,7 @@ import { DriveFile, DriveFolder, Provider, Tag, UploadingFile } from "@util/type
 import { Upload } from "@util/upload";
 import mime from "mime-types";
 import { nanoid } from "nanoid";
-import {
-	createContext,
-	PropsWithChildren,
-	useContext,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { ContextValue, ROOT_FOLDER } from "./useBucket";
 import useUser from "./useUser";
@@ -30,8 +23,8 @@ const S3Context = createContext<ContextValue>(null);
 export default () => useContext(S3Context);
 
 type Props = {
-	data: Drive & { keys: any };
-	fullPath?: string;
+  data: Drive & { keys: any };
+  fullPath?: string;
 };
 
 export const S3Provider: React.FC<PropsWithChildren<Props>> = ({
@@ -490,32 +483,24 @@ export const S3Provider: React.FC<PropsWithChildren<Props>> = ({
 	);
 };
 
-async function emptyS3Directory(
-	client: S3Client,
-	Bucket: string,
-	Prefix: string,
-) {
-	const listParams = { Bucket, Prefix };
-	const listedObjects = await client.send(new ListObjectsV2Command(listParams));
+async function emptyS3Directory(client: S3Client, Bucket: string, Prefix: string) {
+  const listParams = { Bucket, Prefix };
+  const listedObjects = await client.send(new ListObjectsV2Command(listParams));
 
-	if (listedObjects.CommonPrefixes?.length > 0) {
-		for (let i = 0; i < listedObjects.CommonPrefixes.length; i++) {
-			await emptyS3Directory(
-				client,
-				Bucket,
-				listedObjects.CommonPrefixes[i].Prefix,
-			);
-		}
-	}
+  if (listedObjects.CommonPrefixes?.length > 0) {
+    for (let i = 0; i < listedObjects.CommonPrefixes.length; i++) {
+      await emptyS3Directory(client, Bucket, listedObjects.CommonPrefixes[i].Prefix);
+    }
+  }
 
-	if (listedObjects.Contents?.length === 0) return;
+  if (listedObjects.Contents?.length === 0) return;
 
-	const deleteParams = { Bucket, Delete: { Objects: [] } };
+  const deleteParams = { Bucket, Delete: { Objects: [] } };
 
-	for (let i = 0; i < listedObjects.Contents.length; i++) {
-		deleteParams.Delete.Objects.push({ Key: listedObjects.Contents[i].Key });
-	}
+  for (let i = 0; i < listedObjects.Contents.length; i++) {
+    deleteParams.Delete.Objects.push({ Key: listedObjects.Contents[i].Key });
+  }
 
-	await client.send(new DeleteObjectsCommand(deleteParams));
-	if (listedObjects.IsTruncated) await emptyS3Directory(client, Bucket, Prefix);
+  await client.send(new DeleteObjectsCommand(deleteParams));
+  if (listedObjects.IsTruncated) await emptyS3Directory(client, Bucket, Prefix);
 }

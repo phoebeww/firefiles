@@ -5,7 +5,7 @@ import File from "./File";
 import TagsPopup from "../popups/TagsPopup";
 
 interface Props {
-	files: DriveFile[];
+  files: DriveFile[];
 }
 
 const FilesTable: React.FC<Props> = ({ files }) => {
